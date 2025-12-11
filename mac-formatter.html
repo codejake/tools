@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAC Address Formatter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .validation-message {
+            margin-top: 8px;
+            font-size: 13px;
+            min-height: 18px;
+        }
+
+        .validation-message.error {
+            color: #e74c3c;
+        }
+
+        .validation-message.success {
+            color: #27ae60;
+        }
+
+        .validation-message.info {
+            color: #3498db;
+        }
+
+        .checkbox-section {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-section label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .output-section {
+            display: none;
+        }
+
+        .output-section.visible {
+            display: block;
+        }
+
+        .output-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .output-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .output-value-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .output-value {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .copy-btn:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-btn.copied {
+            background: #27ae60;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .output-value {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MAC Address Formatter</h1>
+        <p class="subtitle">Enter a MAC address in any format or just the OUI (first 24 bits)</p>
+
+        <div class="input-section">
+            <label for="macInput">MAC Address or OUI</label>
+            <input type="text" id="macInput" placeholder="e.g., 00:1A:2B:3C:4D:5E or 00-1A-2B">
+            <div class="validation-message" id="validationMessage"></div>
+        </div>
+
+        <div class="checkbox-section">
+            <input type="checkbox" id="uppercaseCheckbox">
+            <label for="uppercaseCheckbox">Convert to uppercase</label>
+        </div>
+
+        <div class="output-section" id="outputSection">
+            <div class="output-item">
+                <div class="output-label">Colon-Delimited</div>
+                <div class="output-value-container">
+                    <div class="output-value" id="colonFormat"></div>
+                    <button class="copy-btn" onclick="copyToClipboard('colonFormat', this)">Copy</button>
+                </div>
+            </div>
+
+            <div class="output-item">
+                <div class="output-label">Hyphen-Delimited</div>
+                <div class="output-value-container">
+                    <div class="output-value" id="hyphenFormat"></div>
+                    <button class="copy-btn" onclick="copyToClipboard('hyphenFormat', this)">Copy</button>
+                </div>
+            </div>
+
+            <div class="output-item">
+                <div class="output-label">No Delimiter</div>
+                <div class="output-value-container">
+                    <div class="output-value" id="noDelimiterFormat"></div>
+                    <button class="copy-btn" onclick="copyToClipboard('noDelimiterFormat', this)">Copy</button>
+                </div>
+            </div>
+
+            <div class="output-item">
+                <div class="output-label">Cisco Style (Dotted)</div>
+                <div class="output-value-container">
+                    <div class="output-value" id="ciscoFormat"></div>
+                    <button class="copy-btn" onclick="copyToClipboard('ciscoFormat', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const macInput = document.getElementById('macInput');
+        const uppercaseCheckbox = document.getElementById('uppercaseCheckbox');
+        const outputSection = document.getElementById('outputSection');
+        const validationMessage = document.getElementById('validationMessage');
+
+        // Format output elements
+        const colonFormat = document.getElementById('colonFormat');
+        const hyphenFormat = document.getElementById('hyphenFormat');
+        const noDelimiterFormat = document.getElementById('noDelimiterFormat');
+        const ciscoFormat = document.getElementById('ciscoFormat');
+
+        // Clean the input and extract only hex characters
+        function cleanMAC(input) {
+            return input.replace(/[^0-9a-fA-F]/g, '');
+        }
+
+        // Validate if the input is a valid MAC or OUI
+        function validateMAC(cleaned) {
+            const length = cleaned.length;
+            
+            if (length === 0) {
+                return { valid: false, type: 'empty' };
+            }
+            
+            if (length === 6) {
+                return { valid: true, type: 'oui' };
+            }
+            
+            if (length === 12) {
+                return { valid: true, type: 'full' };
+            }
+            
+            return { valid: false, type: 'invalid' };
+        }
+
+        // Format MAC address with various delimiters
+        function formatMAC(cleaned, uppercase) {
+            const mac = uppercase ? cleaned.toUpperCase() : cleaned.toLowerCase();
+            
+            // Colon-delimited (00:1a:2b:3c:4d:5e)
+            const colon = mac.match(/.{1,2}/g).join(':');
+            
+            // Hyphen-delimited (00-1a-2b-3c-4d-5e)
+            const hyphen = mac.match(/.{1,2}/g).join('-');
+            
+            // No delimiter (001a2b3c4d5e)
+            const noDelim = mac;
+            
+            // Cisco style (0012.3456.789a)
+            const cisco = mac.match(/.{1,4}/g).join('.');
+            
+            return { colon, hyphen, noDelim, cisco };
+        }
+
+        // Update the display
+        function updateDisplay() {
+            const input = macInput.value.trim();
+            const cleaned = cleanMAC(input);
+            const validation = validateMAC(cleaned);
+            
+            if (validation.type === 'empty') {
+                validationMessage.textContent = '';
+                validationMessage.className = 'validation-message';
+                outputSection.classList.remove('visible');
+                return;
+            }
+            
+            if (!validation.valid) {
+                validationMessage.textContent = `Invalid input. Please enter 6 hex digits (OUI) or 12 hex digits (full MAC address). Currently: ${cleaned.length} digits.`;
+                validationMessage.className = 'validation-message error';
+                outputSection.classList.remove('visible');
+                return;
+            }
+            
+            // Valid input
+            if (validation.type === 'oui') {
+                validationMessage.textContent = '✓ Valid OUI (24-bit Organizationally Unique Identifier)';
+                validationMessage.className = 'validation-message info';
+            } else {
+                validationMessage.textContent = '✓ Valid MAC address (48-bit)';
+                validationMessage.className = 'validation-message success';
+            }
+            
+            // Format and display
+            const uppercase = uppercaseCheckbox.checked;
+            const formats = formatMAC(cleaned, uppercase);
+            
+            colonFormat.textContent = formats.colon;
+            hyphenFormat.textContent = formats.hyphen;
+            noDelimiterFormat.textContent = formats.noDelim;
+            ciscoFormat.textContent = formats.cisco;
+            
+            outputSection.classList.add('visible');
+        }
+
+        // Copy to clipboard functionality
+        function copyToClipboard(elementId, button) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        // Event listeners
+        macInput.addEventListener('input', updateDisplay);
+        uppercaseCheckbox.addEventListener('change', updateDisplay);
+
+        // Initialize
+        updateDisplay();
+    </script>
+</body>
+</html>
